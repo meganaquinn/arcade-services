@@ -22,9 +22,6 @@ namespace Microsoft.DotNet.Darc.Options
         [Option('o',"output-dir", Required = true, HelpText = "Output directory to place build drop.")]
         public string OutputDirectory { get; set; }
 
-        [Option("max-downloads", Default = 4, HelpText = "Maximum concurrent downloads.")]
-        public int MaxConcurrentDownloads { get; set; }
-
         [Option('f', "full", HelpText = "Gather the full drop (build and all input builds).")]
         public bool Transitive { get; set; }
 

@@ -37,9 +37,7 @@ namespace Maestro.Web.Api.v2019_01_16.Models
                 .Select(c => new v2018_07_16.Models.Channel(c))
                 .ToList();
             Assets = other.Assets?.Select(a => new v2018_07_16.Models.Asset(a)).ToList();
-            Dependencies = other.DependentBuildIds?.Select(d => new BuildRef(d.DependentBuildId, d.IsProduct, d.TimeToInclusionInMinutes)).ToList();
-            Staleness = other.Staleness;
-            Released = other.Released;
+            Dependencies = other.DependentBuildIds?.Select(d => new BuildRef(d.DependentBuildId, d.IsProduct)).ToList();
         }
 
         public int Id { get; }
@@ -73,9 +71,5 @@ namespace Maestro.Web.Api.v2019_01_16.Models
         public List<v2018_07_16.Models.Asset> Assets { get; }
 
         public List<BuildRef> Dependencies { get; }
-
-        public int Staleness { get; }
-
-        public bool Released { get; }
     }
 }

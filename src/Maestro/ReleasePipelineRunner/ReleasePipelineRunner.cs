@@ -294,8 +294,7 @@ namespace ReleasePipelineRunner
                             new BuildChannel
                             {
                                 BuildId = buildId,
-                                ChannelId = channelId,
-                                DateTimeAdded = DateTimeOffset.UtcNow
+                                ChannelId = channelId
                             }
                         });
                         break;
@@ -421,8 +420,7 @@ namespace ReleasePipelineRunner
                                 buildChannelsToAdd.Add(new BuildChannel
                                 {
                                     BuildId = buildId,
-                                    ChannelId = channelId,
-                                    DateTimeAdded = DateTimeOffset.UtcNow
+                                    ChannelId = channelId
                                 });
                             }
                             else
@@ -438,7 +436,8 @@ namespace ReleasePipelineRunner
 
                 if (buildChannelsToAdd.Count > 0)
                 {
-                    await AddFinishedBuildChannelsIfNotPresent(buildChannelsToAdd);
+                    List<BuildChannel> addedBuildChannels = await AddFinishedBuildChannelsIfNotPresent(buildChannelsToAdd);
+                    await TriggerDependencyUpdates(addedBuildChannels);
                 }
                 await tx.CommitAsync();
             }
@@ -467,7 +466,7 @@ namespace ReleasePipelineRunner
             return new AzureDevOpsClient(null, accessToken, Logger, null);
         }
 
-        private async Task AddFinishedBuildChannelsIfNotPresent(HashSet<BuildChannel> buildChannelsToAdd)
+        private async Task<List<BuildChannel>> AddFinishedBuildChannelsIfNotPresent(HashSet<BuildChannel> buildChannelsToAdd)
         {
             HashSet<int> channels = new HashSet<int>(Context.Channels.Select(b => b.Id));
 
@@ -478,8 +477,7 @@ namespace ReleasePipelineRunner
             var missingBuildChannels = buildChannelsToAdd.Where(x => !Context.BuildChannels.Any(y => y.ChannelId == x.ChannelId && y.BuildId == x.BuildId)).ToList();
             Context.BuildChannels.AddRange(missingBuildChannels);
             await Context.SaveChangesAsync();
-            // Trigger any dependency updates from the new build.
-            await TriggerDependencyUpdates(missingBuildChannels);
+            return missingBuildChannels;
         }
 
         private async Task CreateGitHubIssueAsync(int buildId, int releaseId, string releaseName)

@@ -6,8 +6,6 @@ variables:
     value: true
   - name: _DotNetArtifactsCategory
     value: .NETCore
-  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - group: SDL_Settings
 
 # CI and PR triggers
 trigger:
@@ -73,13 +71,11 @@ stages:
               
         strategy:
           matrix:
-            # Only build debug in non-official builds
-            ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-                debug_configuration:
-                  _BuildConfig: Debug
-                  _PublishType: none
-                  _SignType: test
-                  _DotNetPublishToBlobFeed : false
+            debug_configuration:
+              _BuildConfig: Debug
+              _PublishType: none
+              _SignType: test
+              _DotNetPublishToBlobFeed : false
             release_configuration:
               _BuildConfig: Release
               # PRs or external builds are not signed.
@@ -214,12 +210,12 @@ stages:
       SDLValidationParameters:
         enable: true
         params: '-SourceToolsList @("policheck","credscan")
-        -TsaInstanceURL $(_TsaInstanceURL)
-        -TsaProjectName $(_TsaProjectName)
-        -TsaNotificationEmail $(_TsaNotificationEmail)
-        -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-        -TsaBugAreaPath $(_TsaBugAreaPath)
-        -TsaIterationPath $(_TsaIterationPath)
+        -TsaInstanceURL "https://devdiv.visualstudio.com/"
+        -TsaProjectName "DEVDIV"
+        -TsaNotificationEmail "dnceng@microsoft.com"
+        -TsaCodebaseAdmin "REDMOND\dn-bot"
+        -TsaBugAreaPath "DevDiv\NET\NET Core "
+        -TsaIterationPath "DevDiv"
         -TsaRepositoryName "Arcade-Services"
         -TsaCodebaseName "Arcade-Services"
         -TsaPublish $True'

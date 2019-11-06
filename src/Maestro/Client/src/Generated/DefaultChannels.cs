@@ -112,11 +112,11 @@ namespace Microsoft.DotNet.Maestro.Client
             {
                 _query.Add("branch", Client.Serialize(branch));
             }
-            if (channelId != default(int?))
+            if (channelId != default)
             {
                 _query.Add("channelId", Client.Serialize(channelId));
             }
-            if (enabled != default(bool?))
+            if (enabled != default)
             {
                 _query.Add("enabled", Client.Serialize(enabled));
             }
@@ -194,7 +194,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (body == default(DefaultChannelCreateData))
+            if (body == default)
             {
                 throw new ArgumentNullException(nameof(body));
             }
@@ -223,7 +223,7 @@ namespace Microsoft.DotNet.Maestro.Client
                 _req = new HttpRequestMessage(HttpMethod.Post, _url);
 
                 string _requestContent = null;
-                if (body != default(DefaultChannelCreateData))
+                if (body != default)
                 {
                     _requestContent = Client.Serialize(body);
                     _req.Content = new StringContent(_requestContent, Encoding.UTF8)
@@ -295,7 +295,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (id == default(int))
+            if (id == default)
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -380,7 +380,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (id == default(int))
+            if (id == default)
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -467,7 +467,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (id == default(int))
+            if (id == default)
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -492,7 +492,7 @@ namespace Microsoft.DotNet.Maestro.Client
                 _req = new HttpRequestMessage(new HttpMethod("PATCH"), _url);
 
                 string _requestContent = null;
-                if (body != default(DefaultChannelUpdateData))
+                if (body != default)
                 {
                     _requestContent = Client.Serialize(body);
                     _req.Content = new StringContent(_requestContent, Encoding.UTF8)

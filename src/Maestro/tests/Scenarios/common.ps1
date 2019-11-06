@@ -219,9 +219,7 @@ function Darc-Delete-Channel($channelName) {
 function Darc-Add-Default-Channel($channelName, $repoUri, $branch) {
     $darcParams = @( "add-default-channel", "--channel", "$channelName", "--repo", "$repoUri", "--branch", "$branch", "--quiet" )
     Darc-Command -darcParams $darcParams
-    # We sometimes call add-default-channel with a refs/heads/ prefix, which
-    # will get stripped away by the DB.
-    $global:defaultChannelsToDelete += @{ channel = $channelName; repo = $repoUri; branch = $branch.ToString().Replace("refs/heads/", "") }
+    $global:defaultChannelsToDelete += @{ channel = $channelName; repo = $repoUri; branch = $branch }
 }
 
 function Darc-Delete-Default-Channel($channelName, $repoUri, $branch) {
@@ -237,14 +235,6 @@ function Darc-Enable-Default-Channel($channelName, $repoUri, $branch) {
 function Darc-Disable-Default-Channel($channelName, $repoUri, $branch) {
     $darcParams = @( "default-channel-status", "--channel", "$channelName", "--repo", "$repoUri", "--branch", "$branch", "--disable" )
     Darc-Command -darcParams $darcParams
-}
-
-function Darc-Get-Default-Channel-From-Api($repoUri, $branch) {
-    $headers = Get-Bar-Headers 'text/plain'
-    $uri = "$maestroInstallation/api/default-channels?repository=$repoUri&branch=$branch&api-version=${barApiVersion}"
-    $response = Invoke-WebRequest -Uri $uri -Headers $headers -Method Get
-    $jsonResponse = $response | ConvertFrom-Json
-    return $jsonResponse
 }
 
 function Darc-Delete-Subscription($subscriptionId) {
@@ -328,7 +318,7 @@ function Add-Build-To-Channel ($buildId, $channelName) {
     Invoke-WebRequest -Uri $uri -Headers $headers -Method Post
 }
 
-function New-Build($repository, $branch, $commit, $buildNumber, $assets, $publishUsingPipelines, $dependencies) {
+function New-Build($repository, $branch, $commit, $buildNumber, $assets, $publishUsingPipelines) {
     if (!$publishUsingPipelines) {
         $publishUsingPipelines = "false"
     }
@@ -346,7 +336,6 @@ function New-Build($repository, $branch, $commit, $buildNumber, $assets, $publis
         azureDevOpsBuildDefinitionId = 6;
         commit = $commit;
         assets = $assets;
-        dependencies = $dependencies;
         publishUsingPipelines = $publishUsingPipelines;
     }
     $bodyJson = ConvertTo-Json $body -Depth 4
@@ -558,20 +547,7 @@ function Compare-Array-Output($expected, $actual) {
 function Validate-AzDO-PullRequest-Contents($pullRequest, $expectedPRTitle, $targetRepoName, $targetBranch, $expectedDependencies) {
     $pullRequestBaseBranch = $pullRequest.sourceRefName.Replace('refs/heads/','')
 
-    # Depending on how quickly each dependency update comes through,
-    # we might have to wait for the title to be updated correctly for batched Subscriptions
-    $tries = 5
-    $validTitle = $false;
-    while ($tries-- -gt 0 -and (-not $validTitle)) {
-        Write-Host "Validating PR title. $tries tries remaining..."
-        if ($pullRequest.title -eq $expectedPRTitle) {
-            $validTitle = $true
-            break
-        }
-        Start-Sleep 30
-    }
-
-    if (-not $validTitle) {
+    if ($pullRequest.title -ne $expectedPRTitle) {
         throw "Expected PR title to be $expectedPRTitle, was $($pullrequest.title)"
     }
 
@@ -818,21 +794,7 @@ function Check-Github-PullRequest-Created($targetRepoName, $targetBranch) {
 
 function Validate-Github-PullRequest-Contents($pullRequest, $expectedPRTitle, $targetRepoName, $targetBranch, $expectedDependencies) {
     $pullRequestBaseBranch = $pullRequest.head.ref
-
-    # Depending on how quickly each dependency update comes through,
-    # we might have to wait for the title to be updated correctly for batched Subscriptions
-    $tries = 5
-    $validTitle = $false
-    while ($tries-- -gt 0) {
-        Write-Host "Validating PR title. $tries tries remaining..."
-        if ($pullRequest.title -eq $expectedPRTitle) {
-            $validTitle = $true
-            break
-        }
-        Start-Sleep 30
-    }
-
-    if (-not $validTitle) {
+    if ($pullRequest.title -ne $expectedPRTitle) {
         throw "Expected PR title to be $expectedPRTitle, was $($pullrequest.title)"
     }
 

@@ -125,23 +125,23 @@ namespace Microsoft.DotNet.Maestro.Client
             {
                 _query.Add("version", Client.Serialize(version));
             }
-            if (buildId != default(int?))
+            if (buildId != default)
             {
                 _query.Add("buildId", Client.Serialize(buildId));
             }
-            if (nonShipping != default(bool?))
+            if (nonShipping != default)
             {
                 _query.Add("nonShipping", Client.Serialize(nonShipping));
             }
-            if (loadLocations != default(bool?))
+            if (loadLocations != default)
             {
                 _query.Add("loadLocations", Client.Serialize(loadLocations));
             }
-            if (page != default(int?))
+            if (page != default)
             {
                 _query.Add("page", Client.Serialize(page));
             }
-            if (perPage != default(int?))
+            if (perPage != default)
             {
                 _query.Add("perPage", Client.Serialize(perPage));
             }
@@ -295,7 +295,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (id == default(int))
+            if (id == default)
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -386,12 +386,12 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (assetId == default(int))
+            if (assetId == default)
             {
                 throw new ArgumentNullException(nameof(assetId));
             }
 
-            if (assetLocationType == default(AddAssetLocationToAssetAssetLocationType))
+            if (assetLocationType == default)
             {
                 throw new ArgumentNullException(nameof(assetLocationType));
             }
@@ -411,7 +411,7 @@ namespace Microsoft.DotNet.Maestro.Client
             {
                 _query.Add("location", Client.Serialize(location));
             }
-            if (assetLocationType != default(AddAssetLocationToAssetAssetLocationType))
+            if (assetLocationType != default)
             {
                 _query.Add("assetLocationType", Client.Serialize(assetLocationType));
             }
@@ -492,12 +492,12 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (assetId == default(int))
+            if (assetId == default)
             {
                 throw new ArgumentNullException(nameof(assetId));
             }
 
-            if (assetLocationId == default(int))
+            if (assetLocationId == default)
             {
                 throw new ArgumentNullException(nameof(assetLocationId));
             }

@@ -15,8 +15,7 @@ namespace Maestro.MergePolicies
             standardGithubIgnoredChecks = new HashSet<string>
             {
                 "WIP",
-                "license/cla",
-                "auto-merge.config.enforce"
+                "license/cla"
             };
             standardAzureDevOpsIgnoredChecks = new HashSet<string>
             {

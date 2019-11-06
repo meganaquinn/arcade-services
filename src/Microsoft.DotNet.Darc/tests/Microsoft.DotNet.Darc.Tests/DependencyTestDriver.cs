@@ -73,7 +73,6 @@ namespace Microsoft.DotNet.Darc.Tests
             GitFileContentContainer container = await _gitFileManager.UpdateDependencyFiles(
                 dependencies,
                 TemporaryRepositoryPath,
-                null,
                 null);
             List<GitFile> filesToUpdate = container.GetFilesToCommit();
             await _gitClient.CommitFilesAsync(filesToUpdate, TemporaryRepositoryPath, null, null);
@@ -88,7 +87,6 @@ namespace Microsoft.DotNet.Darc.Tests
             GitFileContentContainer container = await _gitFileManager.UpdateDependencyFiles(
                 dependencies,
                 TemporaryRepositoryPath,
-                null,
                 null);
             List<GitFile> filesToUpdate = container.GetFilesToCommit();
             await _gitClient.CommitFilesAsync(filesToUpdate, TemporaryRepositoryPath, null, null);

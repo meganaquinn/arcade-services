@@ -10,6 +10,8 @@ export class SubscriptionsTableComponent implements OnChanges {
 
   @Input() public rootId?: number;
   @Input() public subscriptionsList?: Record<string, Subscription[]>;
+  @Input() public includeSubToolsets?: boolean;
+  public currentTab?: string;
 
   get branches() {
     return Object.keys(this.subscriptionsList || {});
@@ -18,5 +20,6 @@ export class SubscriptionsTableComponent implements OnChanges {
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges) {
+    this.currentTab = this.branches[0];
   }
 }

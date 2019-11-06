@@ -124,14 +124,15 @@ namespace Microsoft.DotNet.DarcLib
                         retryCount: 0);
                     return content["content"].ToString();
                 }
-                catch (HttpRequestException reqEx) when (reqEx.Message.Contains("404 (Not Found)") || reqEx.Message.Contains("400 (Bad Request)"))
+                catch (HttpRequestException reqEx) when (reqEx.Message.Contains("404 (Not Found)"))
                 {
                     // Continue
                     lastException = reqEx;
                 }
             }
-
-            throw new DependencyFileNotFoundException(filePath, $"{repoName}", branchOrCommit, lastException);
+            _logger.LogError(
+                        $"Could not get file contents at {filePath} from {repoName} at branch/commit '{branchOrCommit}'.");
+            throw lastException;
         }
 
         /// <summary>
@@ -1196,31 +1197,6 @@ namespace Microsoft.DotNet.DarcLib
         public void AddRemoteIfMissing(string repoDir, string repoUrl)
         {
             throw new NotImplementedException("Cannot add a remote to a remote repo.");
-        }
-
-        /// <summary>
-        /// Checks that a repository exists
-        /// </summary>
-        /// <param name="repoUri">Repository uri</param>
-        /// <returns>True if the repository exists, false otherwise.</returns>
-        public async Task<bool> RepoExistsAsync(string repoUri)
-        {
-            (string accountName, string projectName, string repoName) = ParseRepoUri(repoUri);
-
-            try
-            {
-                await this.ExecuteAzureDevOpsAPIRequestAsync(
-                       HttpMethod.Get,
-                       accountName,
-                       projectName,
-                       $"_apis/git/repositories/{repoName}",
-                       _logger,
-                       logFailure: false);
-                return true;
-            }
-            catch (Exception) { }
-
-            return false;
         }
     }
 }

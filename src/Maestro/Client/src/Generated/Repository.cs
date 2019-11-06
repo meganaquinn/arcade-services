@@ -328,7 +328,7 @@ namespace Microsoft.DotNet.Maestro.Client
                 _req = new HttpRequestMessage(HttpMethod.Post, _url);
 
                 string _requestContent = null;
-                if (body != default(IImmutableList<MergePolicy>))
+                if (body != default)
                 {
                     _requestContent = Client.Serialize(body);
                     _req.Content = new StringContent(_requestContent, Encoding.UTF8)
@@ -422,11 +422,11 @@ namespace Microsoft.DotNet.Maestro.Client
             {
                 _query.Add("branch", Client.Serialize(branch));
             }
-            if (page != default(int?))
+            if (page != default)
             {
                 _query.Add("page", Client.Serialize(page));
             }
-            if (perPage != default(int?))
+            if (perPage != default)
             {
                 _query.Add("perPage", Client.Serialize(perPage));
             }
@@ -520,7 +520,7 @@ namespace Microsoft.DotNet.Maestro.Client
                 throw new ArgumentNullException(nameof(repository));
             }
 
-            if (timestamp == default(long))
+            if (timestamp == default)
             {
                 throw new ArgumentNullException(nameof(timestamp));
             }

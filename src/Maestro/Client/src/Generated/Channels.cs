@@ -373,7 +373,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (id == default(int))
+            if (id == default)
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -458,7 +458,7 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (id == default(int))
+            if (id == default)
             {
                 throw new ArgumentNullException(nameof(id));
             }
@@ -546,12 +546,12 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (buildId == default(int))
+            if (buildId == default)
             {
                 throw new ArgumentNullException(nameof(buildId));
             }
 
-            if (channelId == default(int))
+            if (channelId == default)
             {
                 throw new ArgumentNullException(nameof(channelId));
             }
@@ -639,12 +639,12 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (channelId == default(int))
+            if (channelId == default)
             {
                 throw new ArgumentNullException(nameof(channelId));
             }
 
-            if (pipelineId == default(int))
+            if (pipelineId == default)
             {
                 throw new ArgumentNullException(nameof(pipelineId));
             }
@@ -732,12 +732,12 @@ namespace Microsoft.DotNet.Maestro.Client
             CancellationToken cancellationToken = default
         )
         {
-            if (channelId == default(int))
+            if (channelId == default)
             {
                 throw new ArgumentNullException(nameof(channelId));
             }
 
-            if (pipelineId == default(int))
+            if (pipelineId == default)
             {
                 throw new ArgumentNullException(nameof(pipelineId));
             }

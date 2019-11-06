@@ -32,7 +32,10 @@ namespace Microsoft.DotNet.Darc.Operations
             {
                 IRemote remote = RemoteFactory.GetBarOnlyRemote(_options, Logger);
 
-                IEnumerable<Subscription> subscriptions = await _options.FilterSubscriptions(remote);
+                var subscriptions = (await remote.GetSubscriptionsAsync()).Where(subscription =>
+                {
+                    return _options.SubcriptionFilter(subscription);
+                });
 
                 if (subscriptions.Count() == 0)
                 {
