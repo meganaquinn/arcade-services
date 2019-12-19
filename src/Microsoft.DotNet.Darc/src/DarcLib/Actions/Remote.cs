@@ -353,11 +353,11 @@ namespace Microsoft.DotNet.DarcLib
         /// </summary>
         /// <param name="dependencies">Dependencies to find leaves for.</param>
         /// <remarks>
-        ///     Leaves of the coherent dependency trees.  Basically 
+        ///     Leaves of the coherent dependency trees.  Basically
         ///     this means that the coherent dependency is not
         ///     pointed to by another dependency, or is pointed to by only
         ///     pinned dependencies.
-        ///     
+        ///
         ///     Examples:
         ///         - A->B(pinned)->C->D(pinned)
         ///         - C
@@ -406,8 +406,8 @@ namespace Microsoft.DotNet.DarcLib
             IRemoteFactory remoteFactory)
         {
             List<DependencyUpdate> toUpdate = new List<DependencyUpdate>();
-            
-            IEnumerable<DependencyDetail> leavesOfCoherencyTrees = 
+
+            IEnumerable<DependencyDetail> leavesOfCoherencyTrees =
                 CalculateLeavesOfCoherencyTrees(dependencies);
 
             if (!leavesOfCoherencyTrees.Any())
@@ -797,13 +797,33 @@ namespace Microsoft.DotNet.DarcLib
                 string latestCommit = await _gitClient.GetLastCommitShaAsync(repoUri, branch);
                 List<GitFile> targetEngCommonFiles = await GetCommonScriptFilesAsync(repoUri, latestCommit);
 
+                var deletedFiles = new List<string>();
+
                 foreach (GitFile file in targetEngCommonFiles)
                 {
                     if (!engCommonFiles.Where(f => f.FilePath == file.FilePath).Any())
                     {
-                        file.Operation = GitFileOperation.Delete;
-                        filesToCommit.Add(file);
+                        deletedFiles.Add(file.FilePath);
+                        // This is a file in the repo's eng/common folder that isn't present in Arcade at the
+                        // requested SHA so delete it during the update.
+                        // GitFile instances do not have public setters since we insert/retrieve them from an
+                        // In-memory cache and we don't want anything to modify the cached references,
+                        // so add a copy with a Delete FileOperation.
+                        filesToCommit.Add(new GitFile(
+                                file.FilePath,
+                                file.Content,
+                                file.ContentEncoding,
+                                file.Mode,
+                                GitFileOperation.Delete));
                     }
+                }
+
+                if (deletedFiles.Count > 0)
+                {
+                    _logger.LogInformation($"Dependency update from Arcade commit {arcadeItem.Commit} to {repoUri} " +
+                        $"on branch {branch}@{latestCommit} will delete files in eng/common." +
+                        $" Source file count: {engCommonFiles.Count}, Target file count: {targetEngCommonFiles.Count}." +
+                        $" Deleted files: {String.Join(Environment.NewLine, deletedFiles)}");
                 }
             }
 
@@ -834,7 +854,7 @@ namespace Microsoft.DotNet.DarcLib
         public async Task<GitDiff> GitDiffAsync(string repoUri, string baseVersion, string targetVersion)
         {
             CheckForValidGitClient();
-            
+
             // If base and target are the same, return no diff
             if (baseVersion.Equals(targetVersion, StringComparison.OrdinalIgnoreCase))
             {
@@ -891,6 +911,17 @@ namespace Microsoft.DotNet.DarcLib
         }
 
         /// <summary>
+        ///     Retrieve a specific channel by id.
+        /// </summary>
+        /// <param name="channel">Channel id.</param>
+        /// <returns>Channel or null if not found.</returns>
+        public Task<Channel> GetChannelAsync(int channel)
+        {
+            CheckForValidBarClient();
+            return _barClient.GetChannelAsync(channel);
+        }
+
+        /// <summary>
         ///     Retrieve the latest build of a repository on a specific channel.
         /// </summary>
         /// <param name="repoUri">URI of repository to obtain a build for.</param>
@@ -905,7 +936,7 @@ namespace Microsoft.DotNet.DarcLib
             {
                 return await _barClient.GetLatestBuildAsync(repoUri: repoUri, channelId: channelId);
             }
-            catch (RestApiException e) when (e.Response.StatusCode == HttpStatusCode.NotFound)
+            catch (RestApiException e) when (e.Response.Status == (int) HttpStatusCode.NotFound)
             {
                 return null;
             }
@@ -1163,6 +1194,31 @@ namespace Microsoft.DotNet.DarcLib
         {
             CheckForValidBarClient();
             return _barClient.UpdateBuildAsync(buildId, buildUpdate);
+        }
+
+        /// <summary>
+        ///  Creates a new goal or updates the existing goal (in minutes) for a Defintion in a Channel.
+        /// </summary>
+        /// <param name="channel">Name of channel. For eg: .Net Core 5 Dev</param>
+        /// <param name="definitionId">Azure DevOps DefinitionId.</param>
+        /// <param name="minutes">Goal in minutes for a Definition in a Channel.</param>
+        /// <returns>Async task.</returns>
+        public Task<Goal> SetGoalAsync(string channel, int definitionId, int minutes)
+        {
+            CheckForValidBarClient();
+            return _barClient.SetGoalAsync(channel, definitionId, minutes);
+        }
+
+        /// <summary>
+        ///     Gets goal (in minutes) for a Defintion in a Channel.
+        /// </summary>
+        /// <param name="channel">Name of channel. For eg: .Net Core 5 Dev</param>
+        /// <param name="definitionId">Azure DevOps DefinitionId.</param>
+        /// <returns>Returns Goal in minutes.</returns>
+        public Task<Goal> GetGoalAsync(string channel, int definitionId)
+        {
+            CheckForValidBarClient();
+            return _barClient.GetGoalAsync(channel, definitionId);
         }
     }
 }

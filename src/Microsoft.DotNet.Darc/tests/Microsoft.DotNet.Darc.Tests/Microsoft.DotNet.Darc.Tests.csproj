@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" Version="$(LibGit2SharpVersion)" />
     <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="Microsoft.CodeCoverage" Version="$(MicrosoftCodeCoverageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -774,6 +775,12 @@
     <None Update="inputs\NugetConfigFiles\AddFeedsToNuGetConfigWithoutManagedFeeds\NuGet.output.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="inputs\NugetConfigFiles\PreserveManagedFromFromOutside\NuGet.input.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inputs\NugetConfigFiles\PreserveManagedFromFromOutside\NuGet.output.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="inputs\NugetConfigFiles\WhiteSpaceCorrectlyFormatted\NuGet.input.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -802,12 +809,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="inputs\NugetConfigFiles\RemoveAllManagedFeeds\NuGet.output.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inputs\NugetConfigFiles\RemoveManagedFromFromOutside\NuGet.input.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inputs\NugetConfigFiles\RemoveManagedFromFromOutside\NuGet.output.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="inputs\NugetConfigFiles\ReplaceExistingFeedsWithNewOnes\NuGet.input.config">

@@ -239,5 +239,22 @@ namespace Maestro.Data
 
             return assetList.Select(a => ModelTranslators.DataToClientModel_Asset(a));
         }
+
+        public Task<Channel> GetChannelAsync(int channelId)
+        {
+            throw new NotImplementedException();
+        }
+
+        ///  Unsupported method
+        public Task<Goal> SetGoalAsync(string channel, int definitionId, int minutes)
+        {
+            throw new NotImplementedException();
+        }
+
+        ///  Unsupported method
+        public Task<Goal> GetGoalAsync(string channel, int definitionId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

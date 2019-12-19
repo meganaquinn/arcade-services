@@ -115,6 +115,13 @@ namespace Microsoft.DotNet.DarcLib
         Task<Channel> GetChannelAsync(string channel);
 
         /// <summary>
+        ///     Retrieve a specific channel by id.
+        /// </summary>
+        /// <param name="channel">Channel id.</param>
+        /// <returns>Channel or null if not found.</returns>
+        Task<Channel> GetChannelAsync(int channelId);
+
+        /// <summary>
         ///     Retrieve a set of default channel associations based on the provided filters.
         /// </summary>
         /// <param name="repository">Repository name</param>
@@ -231,5 +238,27 @@ namespace Microsoft.DotNet.DarcLib
         Task<Build> UpdateBuildAsync(int buildId, BuildUpdate buildUpdate);
 
         #endregion
+
+
+        #region Goal Operations
+        /// <summary>
+        ///     Creates a new goal or updates the existing goal (in minutes) for a Defintion in a Channel.
+        /// </summary>
+        /// <param name="channel">Name of channel. For eg: .Net Core 5 Dev</param>
+        /// <param name="definitionId">Azure DevOps DefinitionId.</param>
+        /// <param name="minutes">Goal in minutes for a Definition in a Channel.</param>
+        /// <returns>Async task.</returns>
+        Task<Goal> SetGoalAsync(string channel, int definitionId, int minutes);
+
+        /// <summary>
+        ///     Gets goal (in minutes) for a Defintion in a Channel.
+        /// </summary>
+        /// <param name="channel">Name of channel. For eg: .Net Core 5 Dev</param>
+        /// <param name="definitionId">Azure DevOps DefinitionId.</param>
+        /// <returns>Returns Goal in minutes.</returns>
+        Task<Goal> GetGoalAsync(string channel, int definitionId);
+
+        #endregion
+
     }
 }
