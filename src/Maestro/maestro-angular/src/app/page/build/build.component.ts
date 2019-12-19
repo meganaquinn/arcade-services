@@ -3,7 +3,7 @@ import { ActivatedRoute } from "@angular/router";
 import { map, shareReplay, switchMap, filter, distinctUntilChanged, tap, combineLatest } from 'rxjs/operators';
 import { isAfter, compareAsc, parseISO } from "date-fns";
 
-import { BuildGraph, Build, Subscription } from 'src/maestro-client/models';
+import { BuildGraph, Build, Subscription, SubscriptionPolicy, SubscriptionPolicyUpdateFrequency, SubscriptionData } from 'src/maestro-client/models';
 import { Observable, of, timer, OperatorFunction } from 'rxjs';
 import { BuildStatusService } from 'src/app/services/build-status.service';
 import { BuildStatus } from 'src/app/model/build-status';
@@ -226,7 +226,6 @@ export class BuildComponent implements OnInit, OnChanges {
       statefulPipe(
         combineLatest(params$),
         statefulSwitchMap(([build, params]) => {
-          const currentChannelId = +params.channelId;
           return this.maestroService.subscriptions.listSubscriptionsAsync({
             targetRepository: this.getRepo(build),
           }).pipe(

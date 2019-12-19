@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.DotNet.DarcLib;
@@ -79,11 +78,6 @@ namespace Maestro.Data
             throw new NotImplementedException();
         }
 
-        public Task<Build> GetLatestBuildAsync(string repoUri, int channelId)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<Subscription> GetSubscriptionAsync(Guid subscriptionId)
         {
             throw new NotImplementedException();
@@ -131,6 +125,10 @@ namespace Maestro.Data
         public async Task<IEnumerable<Subscription>> GetSubscriptionsAsync(string sourceRepo = null, string targetRepo = null, int? channelId = null)
         {
             IQueryable<Maestro.Data.Models.Subscription> subscriptions = _context.Subscriptions;
+
+            // This isn't directly used, but if it's explicitly loaded it fills in the Channel objects in the subscriptions
+            List<Maestro.Data.Models.Channel> channels = _context.Channels.ToList();
+
             if (sourceRepo != null)
             {
                 subscriptions = subscriptions.Where(s => s.SourceRepository == sourceRepo);
@@ -144,8 +142,7 @@ namespace Maestro.Data
                 subscriptions = subscriptions.Where(s => s.ChannelId == channelId);
             }
 
-            var subsList = await subscriptions.ToListAsync();
-            return subsList.Select(sub => ModelTranslators.DataToClientModel_Subscription(sub));
+            return subscriptions.Select(sub => ModelTranslators.DataToClientModel_Subscription(sub, null));
         }
 
         /// <summary>
@@ -190,6 +187,26 @@ namespace Maestro.Data
                 .ToListAsync();
 
             return builds.Select(b => ModelTranslators.DataToClientModel_Build(b));
+        }
+
+        /// <summary>
+        ///     Retrieve the latest build of a repository on a specific channel.
+        /// </summary>
+        /// <param name="repoUri">URI of repository to obtain a build for.</param>
+        /// <param name="channelId">Channel the build was applied to.</param>
+        /// <returns>Latest build of <paramref name="repoUri"/> on channel <paramref name="channelId"/>,
+        /// or null if there is no latest.</returns>
+        /// <remarks>The build's assets are returned</remarks>
+        public async Task<Build> GetLatestBuildAsync(string repoUri, int channelId)
+        {
+            Data.Models.Build build = await _context.Builds.Where(b =>
+            (repoUri == b.AzureDevOpsRepository || repoUri == b.GitHubRepository))
+            .Where(b => b.BuildChannels.Any(c => c.ChannelId == channelId))
+            .Include(b => b.Assets)
+            .OrderByDescending(b => b.DateProduced)
+            .FirstOrDefaultAsync();
+
+            return ModelTranslators.DataToClientModel_Build(build) ?? null;
         }
 
         public async Task<IEnumerable<Asset>> GetAssetsAsync(
