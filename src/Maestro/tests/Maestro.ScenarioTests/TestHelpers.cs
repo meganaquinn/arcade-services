@@ -13,7 +13,7 @@ namespace Maestro.ScenarioTests
     {
         public static async Task<string> RunExecutableAsync(string executable, params string[] args)
         {
-            return await RunExecutableAsyncWithInput(executable, " ", args);
+            return await RunExecutableAsyncWithInput(executable, "", args);
         }
 
         public static async Task<string> RunExecutableAsyncWithInput(string executable, string input, params string[] args)
@@ -56,6 +56,10 @@ namespace Maestro.ScenarioTests
             process.Start();
 
             Task<bool> exitTask = tcs.Task;
+
+            //Debugging logging
+            TestContext.WriteLine(input ?? "Input is null");
+
             Task stdin = Task.Run(() => { process.StandardInput.Write(input); process.StandardInput.Close(); });
             Task<string> stdout = process.StandardOutput.ReadLineAsync();
             Task<string> stderr = process.StandardError.ReadLineAsync();
