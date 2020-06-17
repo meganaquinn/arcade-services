@@ -88,7 +88,7 @@ namespace Maestro.ScenarioTests
 
         public async Task ValidatePullRequestDependencies(string targetRepoName, string pullRequestBaseBranch, List<Microsoft.DotNet.DarcLib.DependencyDetail> expectedDependencies)
         {
-            throw new NotImplementedException();
+            await Task.FromException(new NotImplementedException());
         }
 
         public async Task GitCommitAsync(string message)
@@ -191,7 +191,7 @@ namespace Maestro.ScenarioTests
                 {
                     string doubleDelete = await RunDarcAsync("delete-channel", "--name", testChannelName).ConfigureAwait(false);
                 }
-                catch (MaestroTestException ex)
+                catch (MaestroTestException)
                 {
                     // Ignore failures from delete-channel on cleanup, this delete is here to ensure that the channel is deleted
                     // even if the test does not do an explicit delete as part of the test. Other failures are typical that the channel has already been deleted.
@@ -426,7 +426,7 @@ namespace Maestro.ScenarioTests
 
         public async Task DeleteBuildFromChannelAsync(int buildId, string channelName)
         {
-            throw new NotImplementedException();
+            await Task.FromException(new NotImplementedException());
         }
 
         public IDisposable ChangeDirectory(string directory)
