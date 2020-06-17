@@ -123,7 +123,6 @@ stages:
             $manifest.Save("src\Maestro\MaestroApplication\ApplicationPackageRoot\ApplicationManifest.xml")
             git diff
           displayName: Remove Service Fabric RunAsPolicy
-
         - script: eng\common\cibuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
@@ -148,7 +147,6 @@ stages:
               robocopy src/Maestro/MaestroApplication/ApplicationPackageRoot $(Build.ArtifactStagingDirectory)\ServiceFabric\MaestroApplication\projectartifacts\ApplicationPackageRoot /S *.xml
               exit 0
             displayName: Copy Maestro Project Artifacts
-
           - publish: $(Build.ArtifactStagingDirectory)\ServiceFabric\MaestroApplication
             artifact: MaestroApplication
             displayName: Publish MaestroApplication
@@ -163,7 +161,6 @@ stages:
               robocopy src/Telemetry/TelemetryApplication/ApplicationPackageRoot $(Build.ArtifactStagingDirectory)\ServiceFabric\TelemetryApplication\projectartifacts\ApplicationPackageRoot /S *.xml
               exit 0
             displayName: Copy Telemetry Project Artifacts
-
           - publish: $(Build.ArtifactStagingDirectory)\ServiceFabric\TelemetryApplication
             artifact: TelemetryApplication
             displayName: Publish TelemetryApplication
@@ -262,7 +259,6 @@ stages:
           # - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranchName'], 'production')) }}:
             # - powershell: eng\create-tag.ps1 -AccessToken $(System.AccessToken)
 
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\deploy.yaml
     parameters:
       ${{ if ne(variables['Build.SourceBranch'], 'refs/heads/production') }}:
