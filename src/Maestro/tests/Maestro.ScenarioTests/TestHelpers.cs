@@ -13,7 +13,7 @@ namespace Maestro.ScenarioTests
     {
         public static async Task<string> RunExecutableAsync(string executable, params string[] args)
         {
-            return await RunExecutableAsyncWithInput(executable, "", args);
+            return await RunExecutableAsyncWithInput(executable, " ", args);
         }
 
         public static async Task<string> RunExecutableAsyncWithInput(string executable, string input, params string[] args)
@@ -93,6 +93,7 @@ namespace Maestro.ScenarioTests
 
                 if (done == stdin)
                 {
+                    TestContext.WriteLine($"stdin: {stdin}");
                     await stdin;
                     continue;
                 }
