@@ -58,7 +58,7 @@ namespace Maestro.ScenarioTests
             Task<bool> exitTask = tcs.Task;
 
             //Debugging logging
-            WriteOutput("Process stdin: " + input ?? "Input is null");
+            TestContext.WriteLine(input ?? "Input is null");
 
             Task stdin = Task.Run(() => { process.StandardInput.Write(input); process.StandardInput.Close(); });
             Task<string> stdout = process.StandardOutput.ReadLineAsync();
