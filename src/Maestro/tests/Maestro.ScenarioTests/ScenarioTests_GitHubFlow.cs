@@ -121,7 +121,7 @@ namespace Maestro.ScenarioTests
             return Task.CompletedTask;
         }
 
-        [Test]
+     //   [Test]
         [Category("ScenarioTest")]
         public async Task Darc_GitHubFlow_Batched()
         {
@@ -180,7 +180,7 @@ namespace Maestro.ScenarioTests
             }
         }
 
-        [Test]
+      //  [Test]
         [Category("ScenarioTest")]
         public async Task Darc_GitHubFlow_NonBatched_AllChecksSuccessful()
         {
@@ -208,7 +208,7 @@ namespace Maestro.ScenarioTests
             }
         }
 
-        [Test]
+       // [Test]
         [Category("ScenarioTest")]
         public async Task Darc_GitHubFlow_NonBatched()
         {
@@ -259,7 +259,7 @@ namespace Maestro.ScenarioTests
             }
         }
 
-        [Test]
+       // [Test]
         [Category("ScenarioTest")]
         public async Task Darc_GitHubFlow_NonBatched_WithCoherency()
         {

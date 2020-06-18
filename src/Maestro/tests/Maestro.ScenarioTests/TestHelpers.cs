@@ -32,7 +32,7 @@ namespace Maestro.ScenarioTests
                 }
             }
 
-            WriteOutput("Current call: " + FormatExecutableCall(executable, args));
+            WriteOutput("Current call: " + call);
 
             var psi = new ProcessStartInfo(executable)
             {
