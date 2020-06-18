@@ -20,6 +20,8 @@ namespace Maestro.ScenarioTests
         {
             string call = FormatExecutableCall(executable, args);
             TestContext.WriteLine(FormatExecutableCall(executable, args));
+            //Debugging logging
+            TestContext.WriteLine("Input to stdin: " + (input ?? "Input is null"));
             var output = new StringBuilder();
 
             void WriteOutput(string message)
@@ -31,9 +33,6 @@ namespace Maestro.ScenarioTests
                     TestContext.WriteLine(message);
                 }
             }
-
-            //Debugging logging
-            WriteOutput("Input to stdin: " + (input ?? "Input is null"));
 
             var psi = new ProcessStartInfo(executable)
             {
