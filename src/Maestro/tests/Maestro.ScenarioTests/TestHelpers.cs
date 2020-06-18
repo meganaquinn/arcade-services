@@ -32,8 +32,6 @@ namespace Maestro.ScenarioTests
                 }
             }
 
-            WriteOutput("Current call: " + call);
-
             var psi = new ProcessStartInfo(executable)
             {
                 RedirectStandardError = true,
@@ -105,8 +103,6 @@ namespace Maestro.ScenarioTests
 
                 throw new InvalidOperationException("Unexpected Task completed.");
             }
-
-
 
             if (process.ExitCode != 0)
             {
