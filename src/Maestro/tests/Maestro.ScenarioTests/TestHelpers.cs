@@ -33,7 +33,7 @@ namespace Maestro.ScenarioTests
                     TestContext.WriteLine(message);
                 }
             }
-
+            TestContext.WriteLine("About to set up process options.");
             var psi = new ProcessStartInfo(executable)
             {
                 RedirectStandardError = true,
@@ -42,25 +42,39 @@ namespace Maestro.ScenarioTests
                 UseShellExecute = false
             };
 
+            TestContext.WriteLine("Adding arguments to list");
             foreach (string arg in args)
             {
                 psi.ArgumentList.Add(arg);
             }
 
+            TestContext.WriteLine("Creating new process object");
             using var process = new Process
             {
                 StartInfo = psi
             };
 
+            TestContext.WriteLine("Set up task");
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) => { tcs.TrySetResult(true); };
+
+            TestContext.WriteLine("Starting process");
             process.Start();
 
+            TestContext.WriteLine("Setting up input and output tasks");
             Task<bool> exitTask = tcs.Task;
-            Task stdin = Task.Run(() => { process.StandardInput.Write(input); process.StandardInput.Close(); });
+
+            TestContext.WriteLine("Setting up output");
             Task<string> stdout = process.StandardOutput.ReadLineAsync();
+
+            TestContext.WriteLine("Setting up error");
             Task<string> stderr = process.StandardError.ReadLineAsync();
+
+            TestContext.WriteLine("Setting up input");
+            Task stdin = Task.Run(() => { process.StandardInput.Write(input); process.StandardInput.Close(); });
+
+            TestContext.WriteLine("Looping over tasks");
             var list = new List<Task> { exitTask, stdout, stderr, stdin };
             while (list.Count != 0)
             {
@@ -95,6 +109,7 @@ namespace Maestro.ScenarioTests
 
                 if (done == stdin)
                 {
+                    TestContext.WriteLine("Hit stdin task");
                     await stdin;
                     continue;
                 }
