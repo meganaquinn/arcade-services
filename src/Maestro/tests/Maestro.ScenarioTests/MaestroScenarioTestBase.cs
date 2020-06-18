@@ -86,6 +86,19 @@ namespace Maestro.ScenarioTests
             }
         }
 
+        public async Task CheckBatchedAzDoPullRequest(string source1RepoName, string source2RepoName, string targetRepoName, string targetBranch,
+            List<Microsoft.DotNet.DarcLib.DependencyDetail> expectedDependencies, string repoDirectory, bool complete = false)
+        {
+            string expectedPRTitle = $"Find out what this is supposed to be";
+            await CheckAzDoPullRequest(expectedPRTitle, targetRepoName, targetBranch, expectedDependencies, repoDirectory, complete);
+        }
+
+        public async Task CheckAzDoPullRequest(string expectedPRTitle, string targetRepoName, string targetBranch,
+            List<Microsoft.DotNet.DarcLib.DependencyDetail> expectedDependencies, string repoDirectory, bool complete)
+        {
+            await Task.FromException(new NotImplementedException());
+        }
+
         public async Task ValidatePullRequestDependencies(string targetRepoName, string pullRequestBaseBranch, List<Microsoft.DotNet.DarcLib.DependencyDetail> expectedDependencies)
         {
             await Task.FromException(new NotImplementedException());
@@ -175,7 +188,7 @@ namespace Maestro.ScenarioTests
                     await DeleteSubscriptionsForChannel(testChannelName).ConfigureAwait(false);
                     await RunDarcAsync("delete-channel", "--name", testChannelName).ConfigureAwait(false);
                 }
-                catch(MaestroTestException)
+                catch (MaestroTestException)
                 {
                     // Otherwise ignore failures from delete-channel, its just a pre-cleanup that isn't really part of the test
                     // And if the test previously succeeded then it'll fail because the channel doesn't exist
@@ -474,7 +487,8 @@ namespace Maestro.ScenarioTests
 
         public async Task CheckoutBranchAsync(string branchName)
         {
-            await RunGitAsync("checkout", branchName);
+            await RunGitAsync("fetch", "origin");
+            await RunGitAsync("checkout", "-b", branchName);
         }
 
         internal IImmutableList<AssetData> GetAssetData(string asset1Name, string asset1Version, string asset2Name, string asset2Version)
