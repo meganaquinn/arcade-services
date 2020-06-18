@@ -32,6 +32,9 @@ namespace Maestro.ScenarioTests
                 }
             }
 
+            //Debugging logging
+            WriteOutput("Input to stdin: " + (input ?? "Input is null"));
+
             var psi = new ProcessStartInfo(executable)
             {
                 RedirectStandardError = true,
@@ -56,10 +59,6 @@ namespace Maestro.ScenarioTests
             process.Start();
 
             Task<bool> exitTask = tcs.Task;
-
-            //Debugging logging
-            WriteOutput("Input to stdin: " + (input ?? "Input is null"));
-
             Task stdin = Task.Run(() => { process.StandardInput.Write(input); process.StandardInput.Close(); });
             Task<string> stdout = process.StandardOutput.ReadLineAsync();
             Task<string> stderr = process.StandardError.ReadLineAsync();
