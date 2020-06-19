@@ -13,7 +13,7 @@ namespace Maestro.ScenarioTests
     {
         public static async Task<string> RunExecutableAsync(string executable, params string[] args)
         {
-            return await RunExecutableAsyncWithInput(executable, "", args);
+            return await RunExecutableAsyncWithInput(executable, "& REM does a comment work?", args);
         }
 
         public static async Task<string> RunExecutableAsyncWithInput(string executable, string input, params string[] args)
@@ -45,7 +45,14 @@ namespace Maestro.ScenarioTests
             TestContext.WriteLine("Adding arguments to list");
             foreach (string arg in args)
             {
-                psi.ArgumentList.Add(arg);
+                if (arg != null)
+                {
+                    psi.ArgumentList.Add(arg);
+                }
+                else
+                {
+                    TestContext.WriteLine("Found null argument");
+                }
             }
 
             TestContext.WriteLine("Creating new process object");
