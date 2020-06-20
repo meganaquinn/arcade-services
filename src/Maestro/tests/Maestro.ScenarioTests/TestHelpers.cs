@@ -13,15 +13,14 @@ namespace Maestro.ScenarioTests
     {
         public static async Task<string> RunExecutableAsync(string executable, params string[] args)
         {
-            return await RunExecutableAsyncWithInput(executable, "& REM does a comment work?", args);
+            return await RunExecutableAsyncWithInput(executable, "", args);
         }
 
         public static async Task<string> RunExecutableAsyncWithInput(string executable, string input, params string[] args)
         {
             string call = FormatExecutableCall(executable, args);
             TestContext.WriteLine(FormatExecutableCall(executable, args));
-            //Debugging logging
-            TestContext.WriteLine("Input to stdin: " + (input ?? "Input is null"));
+
             var output = new StringBuilder();
 
             void WriteOutput(string message)
@@ -33,7 +32,7 @@ namespace Maestro.ScenarioTests
                     TestContext.WriteLine(message);
                 }
             }
-            TestContext.WriteLine("About to set up process options.");
+
             var psi = new ProcessStartInfo(executable)
             {
                 RedirectStandardError = true,
@@ -42,7 +41,6 @@ namespace Maestro.ScenarioTests
                 UseShellExecute = false
             };
 
-            TestContext.WriteLine("Adding arguments to list");
             foreach (string arg in args)
             {
                 if (arg != null)
@@ -55,33 +53,21 @@ namespace Maestro.ScenarioTests
                 }
             }
 
-            TestContext.WriteLine("Creating new process object");
             using var process = new Process
             {
                 StartInfo = psi
             };
 
-            TestContext.WriteLine("Set up task");
             var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             process.EnableRaisingEvents = true;
             process.Exited += (s, e) => { tcs.TrySetResult(true); };
-
-            TestContext.WriteLine("Starting process");
             process.Start();
 
-            TestContext.WriteLine("Setting up input and output tasks");
             Task<bool> exitTask = tcs.Task;
-
-            TestContext.WriteLine("Setting up output");
             Task<string> stdout = process.StandardOutput.ReadLineAsync();
-
-            TestContext.WriteLine("Setting up error");
             Task<string> stderr = process.StandardError.ReadLineAsync();
-
-            TestContext.WriteLine("Setting up input");
             Task stdin = Task.Run(() => { process.StandardInput.Write(input); process.StandardInput.Close(); });
 
-            TestContext.WriteLine("Looping over tasks");
             var list = new List<Task> { exitTask, stdout, stderr, stdin };
             while (list.Count != 0)
             {
@@ -116,7 +102,6 @@ namespace Maestro.ScenarioTests
 
                 if (done == stdin)
                 {
-                    TestContext.WriteLine("Hit stdin task");
                     await stdin;
                     continue;
                 }
