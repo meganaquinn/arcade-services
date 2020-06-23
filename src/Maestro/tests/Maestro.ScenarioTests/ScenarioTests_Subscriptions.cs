@@ -51,7 +51,6 @@ namespace Maestro.ScenarioTests
             {
                 await using (AsyncDisposableValue<string> channel2 = await CreateTestChannelAsync(channel2Name).ConfigureAwait(false))
                 {
-
                     TestContext.WriteLine("Testing various command line parameters of add-subscription");
                     await using AsyncDisposableValue<string> subscription1Id = await CreateSubscriptionAsync(
                         channel1Name, repo1Name, repo2Name, targetBranch, "everyWeek", "maestro-auth-test");
