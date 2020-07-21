@@ -184,7 +184,16 @@ namespace Maestro.ScenarioTests
 
 
                         TestContext.WriteLine("Cloning target repo to prepare the target branch");
-                        TemporaryDirectory reposFolder = await CloneRepositoryAsync(targetRepoName);
+                        TemporaryDirectory reposFolder;
+                        if (isAzDoTest)
+                        {
+                            reposFolder = CloneAzDoRepository(targetRepoName, targetBranch);
+                        }
+                        else
+                        {
+                            reposFolder = await CloneRepositoryAsync(targetRepoName);
+                        }
+
                         using (ChangeDirectory(reposFolder.Directory))
                         {
                             await using (await CheckoutBranchAsync(targetBranch))
