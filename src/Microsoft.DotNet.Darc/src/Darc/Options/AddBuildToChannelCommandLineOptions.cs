@@ -11,7 +11,11 @@ namespace Microsoft.DotNet.Darc.Options
     internal class AddBuildToChannelCommandLineOptions : CommandLineOptions
     {
         [Option("id", Required = true, HelpText = "BAR id of build to assign to channel.")]
+        [RedactFromLogging]
         public int Id { get; set; }
+
+        [Option("publishing-infra-version", Default = 2, Required = false, HelpText = "Which version of the publishing infrastructure should be used.")]
+        public int PublishingInfraVersion { get; set; }
 
         [Option("channel", HelpText = "Channel to assign build to. Required if --default-channels is not specified.")]
         public string Channel { get; set; }
@@ -23,6 +27,7 @@ namespace Microsoft.DotNet.Darc.Options
         public string SourceBranch { get; set; }
 
         [Option("source-sha", HelpText = "SHA that should be used as base for the promotion build.")]
+        [RedactFromLogging]
         public string SourceSHA { get; set; }
 
         [Option("validate-signing", HelpText = "Perform signing validation.")]
@@ -47,9 +52,11 @@ namespace Microsoft.DotNet.Darc.Options
         public string SDLValidationContinueOnError { get; set; }
 
         [Option("symbol-publishing-parameters", HelpText = "Additional (MSBuild) properties to be passed to symbol publishing")]
+        [RedactFromLogging]
         public string SymbolPublishingAdditionalParameters { get; set; }
 
         [Option("artifact-publishing-parameters", HelpText = "Additional (MSBuild) properties to be passed to asset publishing.")]
+        [RedactFromLogging]
         public string ArtifactPublishingAdditionalParameters { get; set; }
 
         [Option("publish-installers-and-checksums", HelpText = "Whether installers and checksums should be published.")]

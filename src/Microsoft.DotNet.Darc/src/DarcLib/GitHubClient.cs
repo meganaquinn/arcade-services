@@ -352,22 +352,43 @@ namespace Microsoft.DotNet.DarcLib
         }
 
         /// <summary>
-        ///     Merge a pull request
+        /// Gets all the commits related to the pull request
+        /// </summary>
+        /// <param name="pullRequestUrl"></param>
+        /// <returns>All the commits related to the pull request</returns>
+        public async Task<IList<Commit>> GetPullRequestCommitsAsync(string pullRequestUrl)
+        {
+            (string owner, string repo, int id) = ParsePullRequestUri(pullRequestUrl);
+            var pullRequestCommits = await Client.PullRequest.Commits(owner, repo, id);
+            IList<Commit> commits = new List<Commit>(pullRequestCommits.Count);
+            foreach (var commit in pullRequestCommits)
+            {
+                commits.Add(new Commit(commit.Commit.Author.Name,
+                    commit.Sha,
+                    commit.Commit.Message));
+            }
+            return commits;
+        }
+
+        /// <summary>
+        ///     Merge a dependency update pull request
         /// </summary>
         /// <param name="pullRequestUrl">Uri of pull request to merge</param>
         /// <param name="parameters">Settings for merge</param>
+        /// <param name="mergeCommitMessage">Commit message used to merge the pull request</param>
         /// <returns></returns>
-        public async Task MergePullRequestAsync(string pullRequestUrl, MergePullRequestParameters parameters)
+        public async Task MergeDependencyPullRequestAsync(string pullRequestUrl, MergePullRequestParameters parameters, string mergeCommitMessage)
         {
             (string owner, string repo, int id) = ParsePullRequestUri(pullRequestUrl);
-
+            Octokit.PullRequest pr = await Client.PullRequest.Get(owner, repo, id);
+            
             var mergePullRequest = new MergePullRequest
             {
+                CommitMessage = mergeCommitMessage,
                 Sha = parameters.CommitToMerge,
                 MergeMethod = parameters.SquashMerge ? PullRequestMergeMethod.Squash : PullRequestMergeMethod.Merge
             };
 
-            Octokit.PullRequest pr = await Client.PullRequest.Get(owner, repo, id);
             await Client.PullRequest.Merge(owner, repo, id, mergePullRequest);
 
             if (parameters.DeleteSourceBranch)
@@ -481,7 +502,7 @@ namespace Microsoft.DotNet.DarcLib
         /// <returns>Git file with tree item contents.</returns>
         private async Task<GitFile> GetGitItemImpl(string path, TreeItem treeItem, string owner, string repo)
         {
-            Octokit.Blob blob = await ExponentialRetry.RetryAsync(
+            Octokit.Blob blob = await ExponentialRetry.Default.RetryAsync(
                                 async () => await Client.Git.Blob.Get(owner, repo, treeItem.Sha),
                                 ex => _logger.LogError(ex, $"Failed to get blob at sha {treeItem.Sha}"),
                                 ex => ex is ApiException apiex && apiex.StatusCode >= HttpStatusCode.InternalServerError);
