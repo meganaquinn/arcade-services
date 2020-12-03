@@ -659,7 +659,7 @@ namespace Microsoft.DotNet.Maestro.Tasks
             return assetData;
         }
 
-        private BuildModel CreateMergedManifestBuildModel(
+        internal BuildModel CreateMergedManifestBuildModel(
             IImmutableList<AssetData> assets,
             ManifestBuildData manifestBuildData)
         {
