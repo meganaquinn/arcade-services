@@ -52,6 +52,7 @@ namespace Microsoft.DotNet.Maestro.Tasks
 
         // Set up proxy objects to allow unit test mocking
         internal IVersionIdentifierProxy versionIdentifier = new VersionIdentifierProxy();
+        internal IGetEnvProxy getEnvProxy = new GetEnvProxy();
 
         public void Cancel()
         {
@@ -395,20 +396,9 @@ namespace Microsoft.DotNet.Maestro.Tasks
             return (buildsManifestMetadata, signingInfo, manifestBuildData);
         }
 
-        private string GetEnv(string key)
-        {
-            var value = Environment.GetEnvironmentVariable(key);
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new InvalidOperationException($"Required Environment variable {key} not found.");
-            }
-
-            return value;
-        }
-
         private string GetAzDevAccount()
         {
-            var uri = new Uri(GetEnv("SYSTEM_TEAMFOUNDATIONCOLLECTIONURI"));
+            var uri = new Uri(getEnvProxy.GetEnv("SYSTEM_TEAMFOUNDATIONCOLLECTIONURI"));
             if (uri.Host == "dev.azure.com")
             {
                 return uri.AbsolutePath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).First();
@@ -419,47 +409,47 @@ namespace Microsoft.DotNet.Maestro.Tasks
 
         private string GetAzDevProject()
         {
-            return GetEnv("SYSTEM_TEAMPROJECT");
+            return getEnvProxy.GetEnv("SYSTEM_TEAMPROJECT");
         }
 
         private string GetAzDevBuildNumber()
         {
-            return GetEnv("BUILD_BUILDNUMBER");
+            return getEnvProxy.GetEnv("BUILD_BUILDNUMBER");
         }
 
         private string GetAzDevRepository()
         {
-            return GetEnv("BUILD_REPOSITORY_URI");
+            return getEnvProxy.GetEnv("BUILD_REPOSITORY_URI");
         }
 
         private string GetAzDevRepositoryName()
         {
-            return GetEnv("BUILD_REPOSITORY_NAME");
+            return getEnvProxy.GetEnv("BUILD_REPOSITORY_NAME");
         }
 
         private string GetAzDevBranch()
         {
-            return GetEnv("BUILD_SOURCEBRANCH");
+            return getEnvProxy.GetEnv("BUILD_SOURCEBRANCH");
         }
 
         private int GetAzDevBuildId()
         {
-            return int.Parse(GetEnv("BUILD_BUILDID"));
+            return int.Parse(getEnvProxy.GetEnv("BUILD_BUILDID"));
         }
 
         private int GetAzDevBuildDefinitionId()
         {
-            return int.Parse(GetEnv("SYSTEM_DEFINITIONID"));
+            return int.Parse(getEnvProxy.GetEnv("SYSTEM_DEFINITIONID"));
         }
 
         private string GetAzDevCommit()
         {
-            return GetEnv("BUILD_SOURCEVERSION");
+            return getEnvProxy.GetEnv("BUILD_SOURCEVERSION");
         }
 
         private string GetAzDevStagingDirectory()
         {
-            return GetEnv("BUILD_STAGINGDIRECTORY");
+            return getEnvProxy.GetEnv("BUILD_STAGINGDIRECTORY");
         }
 
         /// <summary>
@@ -539,13 +529,6 @@ namespace Microsoft.DotNet.Maestro.Tasks
                     }
                     else
                     {
-                        if (mergedInfo.AzureDevOpsBuildId != signInfo.AzureDevOpsBuildId ||
-                            mergedInfo.AzureDevOpsCollectionUri != signInfo.AzureDevOpsCollectionUri ||
-                            mergedInfo.AzureDevOpsProject != signInfo.AzureDevOpsProject)
-                        {
-                            throw new Exception("Can't merge if one or more manifests have different build id, collection URI or project.");
-                        }
-
                         mergedInfo.FileExtensionSignInfos.AddRange(signInfo.FileExtensionSignInfos);
                         mergedInfo.FileSignInfos.AddRange(signInfo.FileSignInfos);
                         mergedInfo.CertificatesSignInfo.AddRange(signInfo.CertificatesSignInfo);
@@ -728,13 +711,6 @@ namespace Microsoft.DotNet.Maestro.Tasks
 
         private XElement SigningInfoToXml(SigningInformation signingInformation)
         {
-            XAttribute[] attributes = new XAttribute[]
-                {
-                    new XAttribute(nameof(signingInformation.AzureDevOpsCollectionUri), signingInformation.AzureDevOpsCollectionUri),
-                    new XAttribute(nameof(signingInformation.AzureDevOpsProject), signingInformation.AzureDevOpsProject),
-                    new XAttribute(nameof(signingInformation.AzureDevOpsBuildId), signingInformation.AzureDevOpsBuildId)
-                };
-
             List<XElement> signingMetadata = new List<XElement>();
 
             foreach (FileExtensionSignInfo fileExtensionSignInfo in signingInformation.FileExtensionSignInfos)
@@ -792,7 +768,7 @@ namespace Microsoft.DotNet.Maestro.Tasks
                     }));
             }
 
-            return new XElement(nameof(SigningInformation), attributes, signingMetadata);
+            return new XElement(nameof(SigningInformation), signingMetadata);
         }
     }
 }
