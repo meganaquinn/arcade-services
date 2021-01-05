@@ -2,10 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using FluentAssertions;
+using Microsoft.DotNet.Maestro.Client;
 using Microsoft.DotNet.Maestro.Client.Models;
 using Microsoft.DotNet.Maestro.Tasks.Proxies;
+using Microsoft.DotNet.Maestro.Tasks.Tests.Mocks;
 using Microsoft.DotNet.VersionTools.BuildManifest.Model;
 using Moq;
 using NUnit.Framework;
@@ -15,12 +18,30 @@ namespace Microsoft.DotNet.Maestro.Tasks.Tests
     [TestFixture]
     public class GetBuildIdTests
     {
+        //    private static async Task<int?> GetBuildId(DependencyDetail dep, IMaestroApi client, Dictionary<int, Client.Models.Build> buildCache,
+        // Dictionary<(string name, string version, string commit), int> assetCache, CancellationToken cancellationToken)
+
+        private readonly string matchingAsset1Name = "MatchingAsset1";
+        private readonly string matchingAsset2Name = "MatchingAsset2";
+        private readonly string assetNotFound = "AssetNotFoundInBuild";
+        private readonly string matchingVersion = "MatchingAssetVersion";
+        private readonly string mismatchingVersion = "MismatchingAssetVersion";
+        private readonly string matchingCommit = "MatchingCommit";
+        private readonly string mismatchingCommit = "MismatchingCommit";
+        private readonly int matchingId = 12345;
+        private readonly int mismatchingId = 54321;
 
         [SetUp]
         public void GetBuildIdTestSetup()
         {
             //Need to pass in IMaestroApi client, which will call Builds.GetBuildAsync
             //A lot of the logic relies on object references being passed in, so it's important to do the object filling in this setup & not a class one
+            IMaestroApi client = new MaestroApiMock();
+            Dictionary<(string name, string version, string commit), int> assetCache 
+                = new Dictionary<(string name, string version, string commit), int>();
+            assetCache.Add((matchingAsset1Name, matchingVersion, matchingCommit), matchingId);
+            assetCache.Add((matchingAsset2Name, matchingVersion, matchingCommit), matchingId);
+            assetCache.Add((assetNotFound, mismatchingVersion, mismatchingCommit), mismatchingId);
         }
 
         [Test]
